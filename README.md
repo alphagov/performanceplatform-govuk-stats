@@ -32,6 +32,6 @@ Install the dependencies (you may want to do this inside a virtualenv):
 
 Run tests:
 
-    python test.py
+    nosetests
 
 NB: These should eventually be added to the project makefile.

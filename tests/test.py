@@ -206,6 +206,11 @@ class TestAggregatedDataset(unittest.TestCase):
 
 class TestInfoStatistics(unittest.TestCase):
 
+    def setUp(self):
+        self.info = InfoStatistics('foo',
+                              start_date = date(2014, 12, 16),
+                              end_date = date(2015, 01, 27))
+
     @responses.activate
     def testDataProcessing(self):
         searches = """
@@ -307,7 +312,7 @@ class TestInfoStatistics(unittest.TestCase):
                       body='{}',
                       content_type='application/json')
 
-        info.process_data(logger=open(os.devnull, 'w'))
+        self.info.process_data(logger=open(os.devnull, 'w'))
 
         # we're expecting:
         # - 26 GETs to PP: search terms (one for each letter of the alphabet)
@@ -345,9 +350,3 @@ class TestInfoStatistics(unittest.TestCase):
         ]
 
         self.assertEqual(json.loads(responses.calls[-1].request.body), expectedAggregateReport)
-
-if __name__ == "__main__":
-    info = InfoStatistics('foo',
-                          start_date = date(2014, 12, 16),
-                          end_date = date(2015, 01, 27))
-    unittest.main()
