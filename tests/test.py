@@ -8,7 +8,7 @@ import urllib
 import responses
 
 import settings
-from info_statistics import (
+from stats.info_statistics import (
     AggregatedDataset,
     Datapoint,
     GOVUK,

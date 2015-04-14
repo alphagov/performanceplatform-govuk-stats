@@ -21,7 +21,7 @@ NB: This should eventually be done in the project makefile.
 
 Run the script to load data:
 
-    python main.py
+    python -m stats.main
 
 Testing
 -------
