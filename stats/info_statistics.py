@@ -108,9 +108,10 @@ class SmartAnswer():
 
     def combine_datapoints(self, datapoints):
         combined_datapoint = Datapoint(self.path)
-        total_problem_reports_count = sum(map(lambda datapoint: datapoint.get_problem_reports_count(), datapoints))
-        total_search_count = sum(map(lambda datapoint: datapoint.get_search_count(), datapoints))
-        max_pageview_count = max(map(lambda datapoint: datapoint.get_pageview_count(), datapoints))
+
+        total_problem_reports_count = sum(datapoint.get_problem_reports_count() for datapoint in datapoints)
+        total_search_count = sum(datapoint.get_search_count() for datapoint in datapoints)
+        max_pageview_count = max(datapoint.get_pageview_count() for datapoint in datapoints)
 
         combined_datapoint.set_problem_reports_count(total_problem_reports_count)
         combined_datapoint.set_search_count(total_search_count)
