@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 import json
 import os
 import re
@@ -40,6 +40,24 @@ class TestGOVUK(unittest.TestCase):
 
 
 class TestPerformancePlatform(unittest.TestCase):
+
+    def testDatesAreFormattedAsMidnightWithNaiveDatetimes(self):
+        pp = PerformancePlatform('foo',
+                                 start_date=datetime(2014, 12, 16, 5, 45, 0),
+                                 end_date=datetime(2015, 01, 27, 3, 27, 0))
+        expected_start_date = "2014-12-16T00:00:00Z"
+        expected_end_date = "2015-01-27T00:00:00Z"
+        self.assertEqual(pp.start_date, expected_start_date)
+        self.assertEqual(pp.end_date, expected_end_date)
+
+    def testDatesAreFormattedAsMidnightWithNaiveDates(self):
+        pp = PerformancePlatform('foo',
+                                 start_date=date(2014, 12, 16),
+                                 end_date=date(2015, 01, 27))
+        expected_start_date = "2014-12-16T00:00:00Z"
+        expected_end_date = "2015-01-27T00:00:00Z"
+        self.assertEqual(pp.start_date, expected_start_date)
+        self.assertEqual(pp.end_date, expected_end_date)
 
     @responses.activate
     def testProblemReportCountFetching(self):

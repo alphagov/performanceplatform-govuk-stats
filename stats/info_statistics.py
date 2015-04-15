@@ -158,8 +158,10 @@ class PerformancePlatform(object):
 
     def __init__(self, pp_token, start_date, end_date):
         self.pp_token = pp_token
-        self.start_date = start_date
-        self.end_date = end_date
+        # Format dates here so that they won't be accidentally used as
+        # non-midnight datetimes elsewhere in the class:
+        self.start_date = start_date.strftime(self.date_format)
+        self.end_date = end_date.strftime(self.date_format)
 
     def get_problem_report_counts(self):
         results_by_letter = [self._get_problem_report_counts_for_paths_starting_with('/' + letter)
@@ -202,9 +204,9 @@ class PerformancePlatform(object):
 
     def _enrich_mandatory_pp_fields(self, result):
         enriched_result = copy.copy(result.as_dict())
-        enriched_result['_timestamp'] = self.end_date.strftime(self.date_format)
-        enriched_result['_start_at'] = self.start_date.strftime(self.date_format)
-        enriched_result['_end_at'] = self.end_date.strftime(self.date_format)
+        enriched_result['_timestamp'] = self.end_date
+        enriched_result['_start_at'] = self.start_date
+        enriched_result['_end_at'] = self.end_date
         return enriched_result
 
     def _get_pp_data(self, dataset_name, value,
@@ -213,8 +215,8 @@ class PerformancePlatform(object):
         query_parameters = {
             'group_by': 'pagePath',
             'period': 'day',
-            'start_at': self.start_date.strftime(self.date_format),
-            'end_at': self.end_date.strftime(self.date_format),
+            'start_at': self.start_date,
+            'end_at': self.end_date,
             'collect': value,
         }
         if filter_by:
@@ -266,7 +268,10 @@ class InfoStatistics(object):
     """
 
     def __init__(self, pp_token, start_date=None, end_date=None):
-        self.end_date = end_date or datetime.now()
+        """
+        Start and end dates are assumed to be UTC. They can be dates or datetimes.
+        """
+        self.end_date = end_date or datetime.utcnow()
         self.start_date = start_date or (self.end_date - timedelta(days=settings.DAYS))
         self.pp_adapter = PerformancePlatform(pp_token, self.start_date, self.end_date)
 
