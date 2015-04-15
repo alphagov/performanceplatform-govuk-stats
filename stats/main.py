@@ -6,7 +6,7 @@ import settings
 
 if not settings.PP_TOKEN:
     msg = 'You need to set the dataset token for the PP '
-    msg += '%s/%s ' % (settings.DATA_GROUP, settings.RESULTS_DATASET)
+    msg += '{0}/{1} '.format(settings.DATA_GROUP, settings.RESULTS_DATASET)
     msg += 'dataset to run this script. You can get this from '
     msg += 'https://stagecraft.production.performance.service.gov.uk/admin/'
     print msg
