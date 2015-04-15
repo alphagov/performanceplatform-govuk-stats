@@ -1,5 +1,6 @@
 import os
-import info_statistics
+
+from stats import info_statistics
 import settings
 
 if 'PP_DATASET_TOKEN' not in os.environ:

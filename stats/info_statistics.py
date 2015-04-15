@@ -1,15 +1,19 @@
 from __future__ import print_function
+
 import copy
+from datetime import datetime, timedelta
 import io
 import itertools
 import json
 import os
-import requests
-import settings
 import string
 import sys
-from datetime import datetime, timedelta
+
 from performanceplatform.client import DataSet
+import requests
+
+import settings
+
 
 class Datapoint():
     data_fields = ['uniquePageviews', 'problemReports', 'searchUniques', 'pagePath']
