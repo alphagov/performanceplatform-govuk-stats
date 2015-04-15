@@ -234,9 +234,7 @@ class PerformancePlatform(object):
 class GOVUK(object):
 
     def get_smart_answers(self):
-        '''
-        Get all smart answers, from the Search API.
-        '''
+        """Get all smart answers, from the Search API."""
         smart_answers = []
         url = 'https://www.gov.uk/api/search.json?filter_format=smart-answer'
         url += '&start=0&count=1000&fields=link'
@@ -249,25 +247,24 @@ class GOVUK(object):
             print('ERROR ' + url, file=sys.stderr)
 
 
-'''
-InfoStatistics class: this generates the aggregated data for
-the PP's info-statistics dataset. This is used to identify
-pages with high numbers of problem reports and searches.
-It does the following:
-- Fetches data from the PP for all pages with problem reports
-  or searches
-- Aggregates problem reports for smart answers to the level of
-  the starting URL, to aid comparison
-- Initialises a neat output dataset
-- For all URLs with problem reports or searches, fetches data
-  on the number of unique page views
-- Normalise problem reports / searches by the number of unique
-  page views
-- Write output to a local JSON file and to the PP
-'''
-
-
 class InfoStatistics(object):
+    """
+    Generate the aggregated data for the PP's info-statistics dataset.
+
+    This is used to identify pages with high numbers of problem reports and
+    searches.
+    It does the following:
+    - Fetches data from the PP for all pages with problem reports
+      or searches
+    - Aggregates problem reports for smart answers to the level of
+      the starting URL, to aid comparison
+    - Initialises a neat output dataset
+    - For all URLs with problem reports or searches, fetches data
+      on the number of unique page views
+    - Normalise problem reports / searches by the number of unique
+      page views
+    - Write output to a local JSON file and to the PP
+    """
 
     def __init__(self, pp_token, start_date = None, end_date = None):
         self.end_date = end_date or datetime.now()
@@ -275,9 +272,6 @@ class InfoStatistics(object):
         self.pp_adapter = PerformancePlatform(pp_token, self.start_date, self.end_date)
 
     def process_data(self, logger=sys.stdout):
-        '''
-        Main function.
-        '''
         smart_answers = GOVUK().get_smart_answers()
         dataset = self._load_performance_data(smart_answers)
 
