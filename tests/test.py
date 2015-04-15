@@ -17,6 +17,7 @@ from stats.info_statistics import (
     SmartAnswer
 )
 
+
 class TestGOVUK(unittest.TestCase):
 
     @responses.activate
@@ -37,6 +38,7 @@ class TestGOVUK(unittest.TestCase):
                       content_type='application/json')
 
         self.assertEqual(GOVUK().get_smart_answers(), [SmartAnswer("/am-i-getting-minimum-wage")])
+
 
 class TestPerformancePlatform(unittest.TestCase):
 
@@ -159,6 +161,7 @@ class TestPerformancePlatform(unittest.TestCase):
         }
         self.assertEqual(pp.get_unique_pageviews(expected_pageview_counts.keys()), expected_pageview_counts)
 
+
 class TestAggregatedDataset(unittest.TestCase):
     def testAggregatedDataset(self):
         aggregate = AggregatedDataset()
@@ -203,6 +206,7 @@ class TestAggregatedDataset(unittest.TestCase):
 
         self.assertEqual(aggregated_points["/def"]["searchesPer100kViews"], 125.0)
         self.assertEqual(aggregated_points["/xyz"]["searchesPer100kViews"], 125.0)
+
 
 class TestInfoStatistics(unittest.TestCase):
 

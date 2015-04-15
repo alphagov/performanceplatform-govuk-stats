@@ -69,6 +69,7 @@ class Datapoint():
         else:
             return None
 
+
 class AggregatedDataset():
 
     def __init__(self):
@@ -93,6 +94,7 @@ class AggregatedDataset():
         self.entries[path] = self.entries.get(path, Datapoint(path))
         return self.entries[path]
 
+
 class SmartAnswer():
 
     def __init__(self, path):
@@ -114,6 +116,7 @@ class SmartAnswer():
         combined_datapoint.set_search_count(total_search_count)
         combined_datapoint.set_pageview_count(max_pageview_count)
         return combined_datapoint
+
 
 class AggregatedDatasetCombiningSmartAnswers():
 
@@ -145,6 +148,7 @@ class AggregatedDatasetCombiningSmartAnswers():
         removal = lambda datapoint_to_remove: all_datapoints.pop(datapoint_to_remove.get_path(), None)
         map(removal, datapoints_to_remove)
         all_datapoints[datapoint_to_add.get_path()] = datapoint_to_add
+
 
 class PerformancePlatform():
 
@@ -224,6 +228,7 @@ class PerformancePlatform():
         else:
             return []
 
+
 class GOVUK():
 
     def get_smart_answers(self):
@@ -240,6 +245,7 @@ class GOVUK():
                 return [ SmartAnswer(result['link']) for result in results ]
         except requests.exceptions.ConnectionError, requests.exceptions.HTTPError:
             print('ERROR ' + url, file=sys.stderr)
+
 
 '''
 InfoStatistics class: this generates the aggregated data for
