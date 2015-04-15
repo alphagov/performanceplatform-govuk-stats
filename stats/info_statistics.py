@@ -210,7 +210,7 @@ class PerformancePlatform(object):
 
     def _get_pp_data(self, dataset_name, value,
                      filter_by=None, filter_by_prefix=None):
-        dataset = dataset = DataSet.from_group_and_type(settings.DATA_DOMAIN, settings.DATA_GROUP, dataset_name)
+        dataset = DataSet.from_group_and_type(settings.DATA_DOMAIN, settings.DATA_GROUP, dataset_name)
         query_parameters = {
             'group_by': 'pagePath',
             'period': 'day',
