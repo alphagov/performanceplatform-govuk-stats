@@ -188,7 +188,7 @@ class PerformancePlatform(object):
     def save_aggregated_results(self, results):
         data_set = DataSet.from_group_and_type(settings.DATA_DOMAIN,
                                                settings.DATA_GROUP,
-                                               'info-statistics',
+                                               settings.RESULTS_DATASET,
                                                token=self.pp_token)
         enriched_results = [self._enrich_mandatory_pp_fields(result) for result in results]
         data_set.post(enriched_results)

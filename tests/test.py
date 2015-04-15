@@ -7,7 +7,6 @@ import urllib
 
 import responses
 
-import settings
 from stats.info_statistics import (
     AggregatedDataset,
     Datapoint,
