@@ -15,7 +15,7 @@ import requests
 import settings
 
 
-class Datapoint():
+class Datapoint(object):
     data_fields = ['uniquePageviews', 'problemReports', 'searchUniques', 'pagePath']
     calculated_fields = ['_id', 'problemsPer100kViews', 'searchesPer100kViews']
 
@@ -70,7 +70,7 @@ class Datapoint():
             return None
 
 
-class AggregatedDataset():
+class AggregatedDataset(object):
 
     def __init__(self):
         self.entries = {}
@@ -95,7 +95,7 @@ class AggregatedDataset():
         return self.entries[path]
 
 
-class SmartAnswer():
+class SmartAnswer(object):
 
     def __init__(self, path):
         self.path = path
@@ -119,7 +119,7 @@ class SmartAnswer():
         return combined_datapoint
 
 
-class AggregatedDatasetCombiningSmartAnswers():
+class AggregatedDatasetCombiningSmartAnswers(object):
 
     def __init__(self, smartanswers):
         self.underlying_dataset = AggregatedDataset()
@@ -152,7 +152,7 @@ class AggregatedDatasetCombiningSmartAnswers():
         all_datapoints[datapoint_to_add.get_path()] = datapoint_to_add
 
 
-class PerformancePlatform():
+class PerformancePlatform(object):
 
     date_format = "%Y-%m-%dT00:00:00Z"
     date_format_longer = "%Y-%m-%dT00:00:00+00:00"
@@ -231,7 +231,7 @@ class PerformancePlatform():
             return []
 
 
-class GOVUK():
+class GOVUK(object):
 
     def get_smart_answers(self):
         '''
@@ -267,7 +267,7 @@ It does the following:
 '''
 
 
-class InfoStatistics():
+class InfoStatistics(object):
 
     def __init__(self, pp_token, start_date = None, end_date = None):
         self.end_date = end_date or datetime.now()
