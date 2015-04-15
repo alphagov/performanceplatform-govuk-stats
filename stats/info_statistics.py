@@ -20,7 +20,7 @@ class Datapoint(object):
     calculated_fields = ['_id', 'problemsPer100kViews', 'searchesPer100kViews']
 
     def __init__(self, path):
-        self.data = {field: 0 for field in self.data_fields }
+        self.data = {field: 0 for field in self.data_fields}
         self.data['pagePath'] = path
 
     def set_problem_reports_count(self, count):
@@ -45,7 +45,7 @@ class Datapoint(object):
         return self.data['pagePath']
 
     def as_dict(self):
-        return {key:self.__getitem__(key) for key in (self.data_fields + self.calculated_fields)}
+        return {key: self.__getitem__(key) for key in (self.data_fields + self.calculated_fields)}
 
     def __getitem__(self, item):
         if item == 'problemsPer100kViews':
@@ -139,7 +139,7 @@ class AggregatedDatasetCombiningSmartAnswers(object):
 
         for smartanswer in self.smartanswers:
             paths_belonging_to_smartanswer = list(itertools.ifilter(smartanswer.includes, datapoints.keys()))
-            datapoints_for_smartanswer = [ datapoints[path] for path in paths_belonging_to_smartanswer ]
+            datapoints_for_smartanswer = [datapoints[path] for path in paths_belonging_to_smartanswer]
             if datapoints_for_smartanswer:
                 self._replace(datapoints, datapoints_for_smartanswer, smartanswer.combine_datapoints(datapoints_for_smartanswer))
 
@@ -190,7 +190,7 @@ class PerformancePlatform(object):
                                                settings.DATA_GROUP,
                                                'info-statistics',
                                                token=self.pp_token)
-        enriched_results = [ self._enrich_mandatory_pp_fields(result) for result in results ]
+        enriched_results = [self._enrich_mandatory_pp_fields(result) for result in results]
         data_set.post(enriched_results)
 
     def _get_problem_report_counts_for_paths_starting_with(self, path_prefix):
@@ -242,7 +242,7 @@ class GOVUK(object):
             r = requests.get(url)
             if r.status_code == 200:
                 results = r.json()['results']
-                return [ SmartAnswer(result['link']) for result in results ]
+                return [SmartAnswer(result['link']) for result in results]
         except requests.exceptions.ConnectionError, requests.exceptions.HTTPError:
             print('ERROR ' + url, file=sys.stderr)
 
@@ -266,7 +266,7 @@ class InfoStatistics(object):
     - Write output to a local JSON file and to the PP
     """
 
-    def __init__(self, pp_token, start_date = None, end_date = None):
+    def __init__(self, pp_token, start_date=None, end_date=None):
         self.end_date = end_date or datetime.now()
         self.start_date = start_date or (self.end_date - timedelta(days=settings.DAYS))
         self.pp_adapter = PerformancePlatform(pp_token, self.start_date, self.end_date)

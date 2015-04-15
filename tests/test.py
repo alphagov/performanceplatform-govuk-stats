@@ -74,8 +74,8 @@ class TestPerformancePlatform(unittest.TestCase):
                       content_type='application/json')
 
         pp = PerformancePlatform('foo',
-                                 start_date = date(2014, 12, 16),
-                                 end_date = date(2015, 01, 27))
+                                 start_date=date(2014, 12, 16),
+                                 end_date=date(2015, 01, 27))
 
         expected_problem_report_counts = {
             "/academies-financial-returns": 5,
@@ -116,8 +116,8 @@ class TestPerformancePlatform(unittest.TestCase):
                       content_type='application/json')
 
         pp = PerformancePlatform('foo',
-                                 start_date = date(2014, 12, 16),
-                                 end_date = date(2015, 01, 27))
+                                 start_date=date(2014, 12, 16),
+                                 end_date=date(2015, 01, 27))
 
         expected_search_counts = {
             "/academies-financial-returns": 10,
@@ -151,8 +151,8 @@ class TestPerformancePlatform(unittest.TestCase):
                           body=page_statistics % (path, pageview), status=200,
                           content_type='application/json')
         pp = PerformancePlatform('foo',
-                                 start_date = date(2014, 12, 16),
-                                 end_date = date(2015, 01, 27))
+                                 start_date=date(2014, 12, 16),
+                                 end_date=date(2015, 01, 27))
 
         expected_pageview_counts = {
             "/academies-financial-returns": 1000,
@@ -212,8 +212,8 @@ class TestInfoStatistics(unittest.TestCase):
 
     def setUp(self):
         self.info = InfoStatistics('foo',
-                              start_date = date(2014, 12, 16),
-                              end_date = date(2015, 01, 27))
+                              start_date=date(2014, 12, 16),
+                              end_date=date(2015, 01, 27))
 
     @responses.activate
     def testDataProcessing(self):
