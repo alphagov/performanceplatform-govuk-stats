@@ -138,8 +138,8 @@ class AggregatedDatasetCombiningSmartAnswers(object):
         datapoints = self.underlying_dataset.get_aggregated_datapoints()
 
         for smartanswer in self.smartanswers:
-            paths_belonging_to_smartanswer = list(itertools.ifilter(smartanswer.includes, datapoints.keys()))
-            datapoints_for_smartanswer = [datapoints[path] for path in paths_belonging_to_smartanswer]
+            datapoints_for_smartanswer = [dp for path, dp in datapoints.items()
+                                          if smartanswer.includes(path)]
             if datapoints_for_smartanswer:
                 self._replace(datapoints, datapoints_for_smartanswer, smartanswer.combine_datapoints(datapoints_for_smartanswer))
 
