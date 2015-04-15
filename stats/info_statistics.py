@@ -146,8 +146,9 @@ class AggregatedDatasetCombiningSmartAnswers():
         return datapoints
 
     def _replace(self, all_datapoints, datapoints_to_remove, datapoint_to_add):
-        removal = lambda datapoint_to_remove: all_datapoints.pop(datapoint_to_remove.get_path(), None)
-        map(removal, datapoints_to_remove)
+        for datapoint in datapoints_to_remove:
+            all_datapoints.pop(datapoint.get_path(), None)
+
         all_datapoints[datapoint_to_add.get_path()] = datapoint_to_add
 
 
