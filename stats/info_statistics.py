@@ -155,7 +155,6 @@ class AggregatedDatasetCombiningSmartAnswers(object):
 class PerformancePlatform(object):
 
     date_format = "%Y-%m-%dT00:00:00Z"
-    date_format_longer = "%Y-%m-%dT00:00:00+00:00"
 
     def __init__(self, pp_token, start_date, end_date):
         self.pp_token = pp_token
