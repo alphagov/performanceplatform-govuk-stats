@@ -20,7 +20,7 @@ from stats.info_statistics import (
 class TestGOVUK(unittest.TestCase):
 
     @responses.activate
-    def testSmartanswerPathFetch(self):
+    def test_smartanswer_path_fetch(self):
         smart_answers = """
         {
           "results": [
@@ -41,7 +41,7 @@ class TestGOVUK(unittest.TestCase):
 
 class TestPerformancePlatform(unittest.TestCase):
 
-    def testDatesAreFormattedAsMidnightWithNaiveDatetimes(self):
+    def test_dates_are_formatted_as_midnight_with_naive_datetimes(self):
         pp = PerformancePlatform('foo',
                                  start_date=datetime(2014, 12, 16, 5, 45, 0),
                                  end_date=datetime(2015, 01, 27, 3, 27, 0))
@@ -50,7 +50,7 @@ class TestPerformancePlatform(unittest.TestCase):
         self.assertEqual(pp.start_date, expected_start_date)
         self.assertEqual(pp.end_date, expected_end_date)
 
-    def testDatesAreFormattedAsMidnightWithNaiveDates(self):
+    def test_dates_are_formatted_as_midnight_with_naive_dates(self):
         pp = PerformancePlatform('foo',
                                  start_date=date(2014, 12, 16),
                                  end_date=date(2015, 01, 27))
@@ -60,7 +60,7 @@ class TestPerformancePlatform(unittest.TestCase):
         self.assertEqual(pp.end_date, expected_end_date)
 
     @responses.activate
-    def testProblemReportCountFetching(self):
+    def test_problem_report_count_fetching(self):
         page_contacts = """
         {
           "data": [
@@ -102,7 +102,7 @@ class TestPerformancePlatform(unittest.TestCase):
         self.assertEqual(pp.get_problem_report_counts(), expected_problem_report_counts)
 
     @responses.activate
-    def testSearchCountFetching(self):
+    def test_search_count_fetching(self):
         searches = """
         {
           "data": [
@@ -144,7 +144,7 @@ class TestPerformancePlatform(unittest.TestCase):
         self.assertEqual(pp.get_search_counts(), expected_search_counts)
 
     @responses.activate
-    def testUniquePageviewFetching(self):
+    def test_unique_pageview_fetching(self):
         page_statistics = """
         {
           "data": [
@@ -180,7 +180,7 @@ class TestPerformancePlatform(unittest.TestCase):
 
 
 class TestAggregatedDataset(unittest.TestCase):
-    def testAggregatedDataset(self):
+    def test_aggregated_dataset(self):
         aggregate = AggregatedDataset()
         aggregate.add_problem_report_counts({'/abc':2, '/def':3})
         aggregated_points = aggregate.get_aggregated_datapoints()
@@ -233,7 +233,7 @@ class TestInfoStatistics(unittest.TestCase):
                               end_date=date(2015, 01, 27))
 
     @responses.activate
-    def testDataProcessing(self):
+    def test_data_processing(self):
         searches = """
         {
           "data": [
