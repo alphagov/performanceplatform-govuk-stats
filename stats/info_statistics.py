@@ -91,7 +91,8 @@ class AggregatedDataset(object):
         return self.entries
 
     def __getitem__(self, path):
-        self.entries[path] = self.entries.get(path, Datapoint(path))
+        if path not in self.entries:
+            self.entries[path] = Datapoint(path)
         return self.entries[path]
 
 
