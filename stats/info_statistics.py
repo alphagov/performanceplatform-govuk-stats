@@ -45,8 +45,7 @@ class Datapoint(object):
         return self.data['pagePath']
 
     def as_dict(self):
-        return {key: self.__getitem__(key)
-                for key in (self.data_fields + self.calculated_fields)}
+        return {key: self[key] for key in (self.data_fields + self.calculated_fields)}
 
     def __getitem__(self, item):
         if item == 'problemsPer100kViews':
@@ -63,16 +62,12 @@ class Datapoint(object):
                 and self.data["problemReports"]
                 and self.data["uniquePageviews"] > 0):
             return float(self.data['problemReports'] * 100000) / self.data['uniquePageviews']
-        else:
-            return None
 
     def _search_rate(self):
         if (self.data["uniquePageviews"]
                 and self.data["searchUniques"]
                 and self.data["uniquePageviews"] > 0):
             return float(self.data['searchUniques'] * 100000) / self.data['uniquePageviews']
-        else:
-            return None
 
 
 class AggregatedDataset(object):
@@ -96,7 +91,8 @@ class AggregatedDataset(object):
         return self.entries
 
     def __getitem__(self, path):
-        self.entries[path] = self.entries.get(path, Datapoint(path))
+        if path not in self.entries:
+            self.entries[path] = Datapoint(path)
         return self.entries[path]
 
 
@@ -200,8 +196,6 @@ class PerformancePlatform(object):
                                  filter_by=path)
         if data and data[0]['uniquePageviews:sum']:
             return int(data[0]['uniquePageviews:sum'])
-        else:
-            return None
 
     def save_aggregated_results(self, results):
         data_set = DataSet.from_group_and_type(settings.DATA_DOMAIN,
@@ -301,7 +295,6 @@ class InfoStatistics(object):
 
         aggregated_datapoints = dataset.get_aggregated_datapoints().values()
 
-        # TODO: Error handling: not sure how the Python library does this?
         print('Posting data to PP...', file=logger)
         self.pp_adapter.save_aggregated_results(aggregated_datapoints)
 
