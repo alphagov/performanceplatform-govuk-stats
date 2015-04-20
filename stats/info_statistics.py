@@ -153,6 +153,14 @@ class AggregatedDatasetCombiningSmartAnswers(object):
 
 
 class PerformancePlatform(object):
+    """
+    Handles GETting and POSTing data to and from the Performance Platform.
+
+    This class uses the PerformancePlatform Client, which will retry
+    handling GET and POST requests up to five times, if their status
+    codes are 502 or 503. If they still don't succeed, the client
+    raises an exception that is not handled by us.
+    """
 
     date_format = "%Y-%m-%dT00:00:00Z"
 
