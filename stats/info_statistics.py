@@ -63,16 +63,12 @@ class Datapoint(object):
                 and self.data["problemReports"]
                 and self.data["uniquePageviews"] > 0):
             return float(self.data['problemReports'] * 100000) / self.data['uniquePageviews']
-        else:
-            return None
 
     def _search_rate(self):
         if (self.data["uniquePageviews"]
                 and self.data["searchUniques"]
                 and self.data["uniquePageviews"] > 0):
             return float(self.data['searchUniques'] * 100000) / self.data['uniquePageviews']
-        else:
-            return None
 
 
 class AggregatedDataset(object):
@@ -200,8 +196,6 @@ class PerformancePlatform(object):
                                  filter_by=path)
         if data and data[0]['uniquePageviews:sum']:
             return int(data[0]['uniquePageviews:sum'])
-        else:
-            return None
 
     def save_aggregated_results(self, results):
         data_set = DataSet.from_group_and_type(settings.DATA_DOMAIN,
