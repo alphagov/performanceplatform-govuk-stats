@@ -1,1 +1,1 @@
-performanceplatform-client==0.6.0
+performanceplatform-client==0.8.2
