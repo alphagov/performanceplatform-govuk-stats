@@ -294,7 +294,6 @@ class InfoStatistics(object):
 
         aggregated_datapoints = dataset.get_aggregated_datapoints().values()
 
-        # TODO: Error handling: not sure how the Python library does this?
         print('Posting data to PP...', file=logger)
         self.pp_adapter.save_aggregated_results(aggregated_datapoints)
 
