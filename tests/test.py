@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 import json
 import os
 import re
@@ -7,8 +7,7 @@ import urllib
 
 import responses
 
-import settings
-from info_statistics import (
+from stats.info_statistics import (
     AggregatedDataset,
     Datapoint,
     GOVUK,
@@ -17,10 +16,11 @@ from info_statistics import (
     SmartAnswer
 )
 
+
 class TestGOVUK(unittest.TestCase):
 
     @responses.activate
-    def testSmartanswerPathFetch(self):
+    def test_smartanswer_path_fetch(self):
         smart_answers = """
         {
           "results": [
@@ -38,10 +38,29 @@ class TestGOVUK(unittest.TestCase):
 
         self.assertEqual(GOVUK().get_smart_answers(), [SmartAnswer("/am-i-getting-minimum-wage")])
 
+
 class TestPerformancePlatform(unittest.TestCase):
 
+    def test_dates_are_formatted_as_midnight_with_naive_datetimes(self):
+        pp = PerformancePlatform('foo',
+                                 start_date=datetime(2014, 12, 16, 5, 45, 0),
+                                 end_date=datetime(2015, 01, 27, 3, 27, 0))
+        expected_start_date = "2014-12-16T00:00:00Z"
+        expected_end_date = "2015-01-27T00:00:00Z"
+        self.assertEqual(pp.start_date, expected_start_date)
+        self.assertEqual(pp.end_date, expected_end_date)
+
+    def test_dates_are_formatted_as_midnight_with_naive_dates(self):
+        pp = PerformancePlatform('foo',
+                                 start_date=date(2014, 12, 16),
+                                 end_date=date(2015, 01, 27))
+        expected_start_date = "2014-12-16T00:00:00Z"
+        expected_end_date = "2015-01-27T00:00:00Z"
+        self.assertEqual(pp.start_date, expected_start_date)
+        self.assertEqual(pp.end_date, expected_end_date)
+
     @responses.activate
-    def testProblemReportCountFetching(self):
+    def test_problem_report_count_fetching(self):
         page_contacts = """
         {
           "data": [
@@ -72,8 +91,8 @@ class TestPerformancePlatform(unittest.TestCase):
                       content_type='application/json')
 
         pp = PerformancePlatform('foo',
-                                 start_date = date(2014, 12, 16),
-                                 end_date = date(2015, 01, 27))
+                                 start_date=date(2014, 12, 16),
+                                 end_date=date(2015, 01, 27))
 
         expected_problem_report_counts = {
             "/academies-financial-returns": 5,
@@ -83,7 +102,7 @@ class TestPerformancePlatform(unittest.TestCase):
         self.assertEqual(pp.get_problem_report_counts(), expected_problem_report_counts)
 
     @responses.activate
-    def testSearchCountFetching(self):
+    def test_search_count_fetching(self):
         searches = """
         {
           "data": [
@@ -114,8 +133,8 @@ class TestPerformancePlatform(unittest.TestCase):
                       content_type='application/json')
 
         pp = PerformancePlatform('foo',
-                                 start_date = date(2014, 12, 16),
-                                 end_date = date(2015, 01, 27))
+                                 start_date=date(2014, 12, 16),
+                                 end_date=date(2015, 01, 27))
 
         expected_search_counts = {
             "/academies-financial-returns": 10,
@@ -125,7 +144,7 @@ class TestPerformancePlatform(unittest.TestCase):
         self.assertEqual(pp.get_search_counts(), expected_search_counts)
 
     @responses.activate
-    def testUniquePageviewFetching(self):
+    def test_unique_pageview_fetching(self):
         page_statistics = """
         {
           "data": [
@@ -149,8 +168,8 @@ class TestPerformancePlatform(unittest.TestCase):
                           body=page_statistics % (path, pageview), status=200,
                           content_type='application/json')
         pp = PerformancePlatform('foo',
-                                 start_date = date(2014, 12, 16),
-                                 end_date = date(2015, 01, 27))
+                                 start_date=date(2014, 12, 16),
+                                 end_date=date(2015, 01, 27))
 
         expected_pageview_counts = {
             "/academies-financial-returns": 1000,
@@ -159,8 +178,9 @@ class TestPerformancePlatform(unittest.TestCase):
         }
         self.assertEqual(pp.get_unique_pageviews(expected_pageview_counts.keys()), expected_pageview_counts)
 
+
 class TestAggregatedDataset(unittest.TestCase):
-    def testAggregatedDataset(self):
+    def test_aggregated_dataset(self):
         aggregate = AggregatedDataset()
         aggregate.add_problem_report_counts({'/abc':2, '/def':3})
         aggregated_points = aggregate.get_aggregated_datapoints()
@@ -204,10 +224,16 @@ class TestAggregatedDataset(unittest.TestCase):
         self.assertEqual(aggregated_points["/def"]["searchesPer100kViews"], 125.0)
         self.assertEqual(aggregated_points["/xyz"]["searchesPer100kViews"], 125.0)
 
+
 class TestInfoStatistics(unittest.TestCase):
 
+    def setUp(self):
+        self.info = InfoStatistics('foo',
+                              start_date=date(2014, 12, 16),
+                              end_date=date(2015, 01, 27))
+
     @responses.activate
-    def testDataProcessing(self):
+    def test_data_processing(self):
         searches = """
         {
           "data": [
@@ -307,7 +333,7 @@ class TestInfoStatistics(unittest.TestCase):
                       body='{}',
                       content_type='application/json')
 
-        info.process_data(logger=open(os.devnull, 'w'))
+        self.info.process_data(logger=open(os.devnull, 'w'))
 
         # we're expecting:
         # - 26 GETs to PP: search terms (one for each letter of the alphabet)
@@ -345,9 +371,3 @@ class TestInfoStatistics(unittest.TestCase):
         ]
 
         self.assertEqual(json.loads(responses.calls[-1].request.body), expectedAggregateReport)
-
-if __name__ == "__main__":
-    info = InfoStatistics('foo',
-                          start_date = date(2014, 12, 16),
-                          end_date = date(2015, 01, 27))
-    unittest.main()

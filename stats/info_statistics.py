@@ -1,22 +1,26 @@
 from __future__ import print_function
+
 import copy
+from datetime import datetime, timedelta
 import io
 import itertools
 import json
 import os
-import requests
-import settings
 import string
 import sys
-from datetime import datetime, timedelta
-from performanceplatform.client import DataSet
 
-class Datapoint():
+from performanceplatform.client import DataSet
+import requests
+
+import settings
+
+
+class Datapoint(object):
     data_fields = ['uniquePageviews', 'problemReports', 'searchUniques', 'pagePath']
     calculated_fields = ['_id', 'problemsPer100kViews', 'searchesPer100kViews']
 
     def __init__(self, path):
-        self.data = {field: 0 for field in self.data_fields }
+        self.data = {field: 0 for field in self.data_fields}
         self.data['pagePath'] = path
 
     def set_problem_reports_count(self, count):
@@ -41,7 +45,7 @@ class Datapoint():
         return self.data['pagePath']
 
     def as_dict(self):
-        return {key:self.__getitem__(key) for key in (self.data_fields + self.calculated_fields)}
+        return {key: self.__getitem__(key) for key in (self.data_fields + self.calculated_fields)}
 
     def __getitem__(self, item):
         if item == 'problemsPer100kViews':
@@ -65,7 +69,8 @@ class Datapoint():
         else:
             return None
 
-class AggregatedDataset():
+
+class AggregatedDataset(object):
 
     def __init__(self):
         self.entries = {}
@@ -89,7 +94,8 @@ class AggregatedDataset():
         self.entries[path] = self.entries.get(path, Datapoint(path))
         return self.entries[path]
 
-class SmartAnswer():
+
+class SmartAnswer(object):
 
     def __init__(self, path):
         self.path = path
@@ -102,16 +108,18 @@ class SmartAnswer():
 
     def combine_datapoints(self, datapoints):
         combined_datapoint = Datapoint(self.path)
-        total_problem_reports_count = sum(map(lambda datapoint: datapoint.get_problem_reports_count(), datapoints))
-        total_search_count = sum(map(lambda datapoint: datapoint.get_search_count(), datapoints))
-        max_pageview_count = max(map(lambda datapoint: datapoint.get_pageview_count(), datapoints))
+
+        total_problem_reports_count = sum(datapoint.get_problem_reports_count() for datapoint in datapoints)
+        total_search_count = sum(datapoint.get_search_count() for datapoint in datapoints)
+        max_pageview_count = max(datapoint.get_pageview_count() for datapoint in datapoints)
 
         combined_datapoint.set_problem_reports_count(total_problem_reports_count)
         combined_datapoint.set_search_count(total_search_count)
         combined_datapoint.set_pageview_count(max_pageview_count)
         return combined_datapoint
 
-class AggregatedDatasetCombiningSmartAnswers():
+
+class AggregatedDatasetCombiningSmartAnswers(object):
 
     def __init__(self, smartanswers):
         self.underlying_dataset = AggregatedDataset()
@@ -130,27 +138,38 @@ class AggregatedDatasetCombiningSmartAnswers():
         datapoints = self.underlying_dataset.get_aggregated_datapoints()
 
         for smartanswer in self.smartanswers:
-            paths_belonging_to_smartanswer = list(itertools.ifilter(smartanswer.includes, datapoints.keys()))
-            datapoints_for_smartanswer = [ datapoints[path] for path in paths_belonging_to_smartanswer ]
+            datapoints_for_smartanswer = [dp for path, dp in datapoints.items()
+                                          if smartanswer.includes(path)]
             if datapoints_for_smartanswer:
                 self._replace(datapoints, datapoints_for_smartanswer, smartanswer.combine_datapoints(datapoints_for_smartanswer))
 
         return datapoints
 
     def _replace(self, all_datapoints, datapoints_to_remove, datapoint_to_add):
-        removal = lambda datapoint_to_remove: all_datapoints.pop(datapoint_to_remove.get_path(), None)
-        map(removal, datapoints_to_remove)
+        for datapoint in datapoints_to_remove:
+            all_datapoints.pop(datapoint.get_path(), None)
+
         all_datapoints[datapoint_to_add.get_path()] = datapoint_to_add
 
-class PerformancePlatform():
+
+class PerformancePlatform(object):
+    """
+    Handles GETting and POSTing data to and from the Performance Platform.
+
+    This class uses the PerformancePlatform Client, which will retry
+    handling GET and POST requests up to five times, if their status
+    codes are 502 or 503. If they still don't succeed, the client
+    raises an exception that is not handled by us.
+    """
 
     date_format = "%Y-%m-%dT00:00:00Z"
-    date_format_longer = "%Y-%m-%dT00:00:00+00:00"
 
     def __init__(self, pp_token, start_date, end_date):
         self.pp_token = pp_token
-        self.start_date = start_date
-        self.end_date = end_date
+        # Format dates here so that they won't be accidentally used as
+        # non-midnight datetimes elsewhere in the class:
+        self.start_date = start_date.strftime(self.date_format)
+        self.end_date = end_date.strftime(self.date_format)
 
     def get_problem_report_counts(self):
         results_by_letter = [self._get_problem_report_counts_for_paths_starting_with('/' + letter)
@@ -178,9 +197,9 @@ class PerformancePlatform():
     def save_aggregated_results(self, results):
         data_set = DataSet.from_group_and_type(settings.DATA_DOMAIN,
                                                settings.DATA_GROUP,
-                                               'info-statistics',
+                                               settings.RESULTS_DATASET,
                                                token=self.pp_token)
-        enriched_results = [ self._enrich_mandatory_pp_fields(result) for result in results ]
+        enriched_results = [self._enrich_mandatory_pp_fields(result) for result in results]
         data_set.post(enriched_results)
 
     def _get_problem_report_counts_for_paths_starting_with(self, path_prefix):
@@ -193,19 +212,19 @@ class PerformancePlatform():
 
     def _enrich_mandatory_pp_fields(self, result):
         enriched_result = copy.copy(result.as_dict())
-        enriched_result['_timestamp'] = self.end_date.strftime(self.date_format)
-        enriched_result['_start_at'] = self.start_date.strftime(self.date_format)
-        enriched_result['_end_at'] = self.end_date.strftime(self.date_format)
+        enriched_result['_timestamp'] = self.end_date
+        enriched_result['_start_at'] = self.start_date
+        enriched_result['_end_at'] = self.end_date
         return enriched_result
 
     def _get_pp_data(self, dataset_name, value,
                      filter_by=None, filter_by_prefix=None):
-        dataset = dataset = DataSet.from_group_and_type(settings.DATA_DOMAIN, settings.DATA_GROUP, dataset_name)
+        dataset = DataSet.from_group_and_type(settings.DATA_DOMAIN, settings.DATA_GROUP, dataset_name)
         query_parameters = {
             'group_by': 'pagePath',
             'period': 'day',
-            'start_at': self.start_date.strftime(self.date_format),
-            'end_at': self.end_date.strftime(self.date_format),
+            'start_at': self.start_date,
+            'end_at': self.end_date,
             'collect': value,
         }
         if filter_by:
@@ -220,12 +239,11 @@ class PerformancePlatform():
         else:
             return []
 
-class GOVUK():
+
+class GOVUK(object):
 
     def get_smart_answers(self):
-        '''
-        Get all smart answers, from the Search API.
-        '''
+        """Get all smart answers, from the Search API."""
         smart_answers = []
         url = 'https://www.gov.uk/api/search.json?filter_format=smart-answer'
         url += '&start=0&count=1000&fields=link'
@@ -233,39 +251,39 @@ class GOVUK():
             r = requests.get(url)
             if r.status_code == 200:
                 results = r.json()['results']
-                return [ SmartAnswer(result['link']) for result in results ]
+                return [SmartAnswer(result['link']) for result in results]
         except requests.exceptions.ConnectionError, requests.exceptions.HTTPError:
             print('ERROR ' + url, file=sys.stderr)
 
-'''
-InfoStatistics class: this generates the aggregated data for
-the PP's info-statistics dataset. This is used to identify
-pages with high numbers of problem reports and searches.
-It does the following:
-- Fetches data from the PP for all pages with problem reports
-  or searches
-- Aggregates problem reports for smart answers to the level of
-  the starting URL, to aid comparison
-- Initialises a neat output dataset
-- For all URLs with problem reports or searches, fetches data
-  on the number of unique page views
-- Normalise problem reports / searches by the number of unique
-  page views
-- Write output to a local JSON file and to the PP
-'''
 
+class InfoStatistics(object):
+    """
+    Generate the aggregated data for the PP's info-statistics dataset.
 
-class InfoStatistics():
+    This is used to identify pages with high numbers of problem reports and
+    searches.
+    It does the following:
+    - Fetches data from the PP for all pages with problem reports
+      or searches
+    - Aggregates problem reports for smart answers to the level of
+      the starting URL, to aid comparison
+    - Initialises a neat output dataset
+    - For all URLs with problem reports or searches, fetches data
+      on the number of unique page views
+    - Normalise problem reports / searches by the number of unique
+      page views
+    - Write output to a local JSON file and to the PP
+    """
 
-    def __init__(self, pp_token, start_date = None, end_date = None):
-        self.end_date = end_date or datetime.now()
+    def __init__(self, pp_token, start_date=None, end_date=None):
+        """
+        Start and end dates are assumed to be UTC. They can be dates or datetimes.
+        """
+        self.end_date = end_date or datetime.utcnow()
         self.start_date = start_date or (self.end_date - timedelta(days=settings.DAYS))
         self.pp_adapter = PerformancePlatform(pp_token, self.start_date, self.end_date)
 
     def process_data(self, logger=sys.stdout):
-        '''
-        Main function.
-        '''
         smart_answers = GOVUK().get_smart_answers()
         dataset = self._load_performance_data(smart_answers)
 
