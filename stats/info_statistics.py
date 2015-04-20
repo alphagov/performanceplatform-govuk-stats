@@ -45,8 +45,7 @@ class Datapoint(object):
         return self.data['pagePath']
 
     def as_dict(self):
-        return {key: self.__getitem__(key)
-                for key in (self.data_fields + self.calculated_fields)}
+        return {key: self[key] for key in (self.data_fields + self.calculated_fields)}
 
     def __getitem__(self, item):
         if item == 'problemsPer100kViews':
