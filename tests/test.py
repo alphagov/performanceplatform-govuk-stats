@@ -31,12 +31,15 @@ class TestGOVUK(unittest.TestCase):
         }
         """
 
-        url_re = re.compile(r'https://www.gov.uk/api/search.json\?filter_format=smart-answer.*?')
+        url_re = re.compile(
+            r'https://www.gov.uk/api/search.json\?filter_format=smart-answer.*?'
+        )
         responses.add(responses.GET, url_re,
                       body=smart_answers, status=200,
                       content_type='application/json')
 
-        self.assertEqual(GOVUK().get_smart_answers(), [SmartAnswer("/am-i-getting-minimum-wage")])
+        self.assertEqual(GOVUK().get_smart_answers(),
+                         [SmartAnswer("/am-i-getting-minimum-wage")])
 
 
 class TestPerformancePlatform(unittest.TestCase):
@@ -80,12 +83,16 @@ class TestPerformancePlatform(unittest.TestCase):
         }
         """
 
-        url_re = re.compile(r'https://www.performance.service.gov.uk/data/govuk-info/page-contacts.*?filter_by_prefix=pagePath%3A%2Fa') # pagePath:/a
+        url_re = re.compile(
+            r'https://www.performance.service.gov.uk/data/govuk-info/page-contacts.*?filter_by_prefix=pagePath%3A%2Fa'
+        ) # pagePath:/a
         responses.add(responses.GET, url_re,
                       body=page_contacts, status=200,
                       content_type='application/json')
 
-        url_re = re.compile(r'https://www.performance.service.gov.uk/data/govuk-info/page-contacts.*?')
+        url_re = re.compile(
+            r'https://www.performance.service.gov.uk/data/govuk-info/page-contacts.*?'
+        )
         responses.add(responses.GET, url_re,
                       body='[]', status=200,
                       content_type='application/json')
@@ -99,7 +106,8 @@ class TestPerformancePlatform(unittest.TestCase):
             "/am-i-getting-minimum-wage": 3,
             "/am-i-getting-minimum-wage/y": 1
         }
-        self.assertEqual(pp.get_problem_report_counts(), expected_problem_report_counts)
+        self.assertEqual(pp.get_problem_report_counts(),
+                         expected_problem_report_counts)
 
     @responses.activate
     def test_search_count_fetching(self):
@@ -122,12 +130,16 @@ class TestPerformancePlatform(unittest.TestCase):
         }
         """
 
-        url_re = re.compile(r'https://www.performance.service.gov.uk/data/govuk-info/search-terms.*?filter_by_prefix=pagePath%3A%2Fa') # pagePath:/a
+        url_re = re.compile(
+            r'https://www.performance.service.gov.uk/data/govuk-info/search-terms.*?filter_by_prefix=pagePath%3A%2Fa'
+        ) # pagePath:/a
         responses.add(responses.GET, url_re,
                       body=searches, status=200,
                       content_type='application/json')
 
-        url_re = re.compile(r'https://www.performance.service.gov.uk/data/govuk-info/search-terms.*?')
+        url_re = re.compile(
+            r'https://www.performance.service.gov.uk/data/govuk-info/search-terms.*?'
+        )
         responses.add(responses.GET, url_re,
                       body='[]', status=200,
                       content_type='application/json')
@@ -163,7 +175,9 @@ class TestPerformancePlatform(unittest.TestCase):
         }
 
         for path, pageview in expected_pageviews_calls.iteritems():
-            url_re = re.compile(r'https://www.performance.service.gov.uk/data/govuk-info/page-statistics.*?'+ urllib.quote("pagePath:"+path, "") +".*?")
+            url_re = re.compile(
+                r'https://www.performance.service.gov.uk/data/govuk-info/page-statistics.*?' + urllib.quote("pagePath:" + path, "") + ".*?"
+            )
             responses.add(responses.GET, url_re,
                           body=page_statistics % (path, pageview), status=200,
                           content_type='application/json')
@@ -176,7 +190,8 @@ class TestPerformancePlatform(unittest.TestCase):
             "/am-i-getting-minimum-wage": 2000,
             "/am-i-getting-minimum-wage/y": 500
         }
-        self.assertEqual(pp.get_unique_pageviews(expected_pageview_counts.keys()), expected_pageview_counts)
+        self.assertEqual(pp.get_unique_pageviews(expected_pageview_counts.keys()),
+                         expected_pageview_counts)
 
 
 class TestAggregatedDataset(unittest.TestCase):
@@ -229,8 +244,8 @@ class TestInfoStatistics(unittest.TestCase):
 
     def setUp(self):
         self.info = InfoStatistics('foo',
-                              start_date=date(2014, 12, 16),
-                              end_date=date(2015, 01, 27))
+                                   start_date=date(2014, 12, 16),
+                                   end_date=date(2015, 01, 27))
 
     @responses.activate
     def test_data_processing(self):
@@ -298,38 +313,51 @@ class TestInfoStatistics(unittest.TestCase):
         }
         """
 
-        url_re = re.compile(r'https://www.performance.service.gov.uk/data/govuk-info/search-terms.*?filter_by_prefix=pagePath%3A%2Fa') # pagePath:/a
+        url_re = re.compile(
+            r'https://www.performance.service.gov.uk/data/govuk-info/search-terms.*?filter_by_prefix=pagePath%3A%2Fa'
+        ) # pagePath:/a
         responses.add(responses.GET, url_re,
                       body=searches, status=200,
                       content_type='application/json')
 
-        url_re = re.compile(r'https://www.performance.service.gov.uk/data/govuk-info/search-terms.*?')
+        url_re = re.compile(
+            r'https://www.performance.service.gov.uk/data/govuk-info/search-terms.*?'
+        )
         responses.add(responses.GET, url_re,
                       body='[]', status=200,
                       content_type='application/json')
 
-        url_re = re.compile(r'https://www.performance.service.gov.uk/data/govuk-info/page-contacts.*?filter_by_prefix=pagePath%3A%2Fa') # pagePath:/a
+        url_re = re.compile(
+            r'https://www.performance.service.gov.uk/data/govuk-info/page-contacts.*?filter_by_prefix=pagePath%3A%2Fa'
+        ) # pagePath:/a
         responses.add(responses.GET, url_re,
                       body=page_contacts, status=200,
                       content_type='application/json')
 
-        url_re = re.compile(r'https://www.performance.service.gov.uk/data/govuk-info/page-contacts.*?')
+        url_re = re.compile(
+            r'https://www.performance.service.gov.uk/data/govuk-info/page-contacts.*?'
+        )
         responses.add(responses.GET, url_re,
                       body='[]', status=200,
                       content_type='application/json')
 
         for path, pageview in expected_pageviews_calls.iteritems():
-            url_re = re.compile(r'https://www.performance.service.gov.uk/data/govuk-info/page-statistics.*?'+ urllib.quote("pagePath:"+path, "") +".*?")
+            url_re = re.compile(
+                r'https://www.performance.service.gov.uk/data/govuk-info/page-statistics.*?' + urllib.quote("pagePath:" + path, "") + ".*?"
+            )
             responses.add(responses.GET, url_re,
                           body=page_statistics % (path, pageview), status=200,
                           content_type='application/json')
 
-        url_re = re.compile(r'https://www.gov.uk/api/search.json\?filter_format=smart-answer.*?')
+        url_re = re.compile(
+            r'https://www.gov.uk/api/search.json\?filter_format=smart-answer.*?'
+        )
         responses.add(responses.GET, url_re,
                       body=smart_answers, status=200,
                       content_type='application/json')
 
-        responses.add(responses.POST, 'https://www.performance.service.gov.uk/data/govuk-info/info-statistics',
+        responses.add(responses.POST,
+                      'https://www.performance.service.gov.uk/data/govuk-info/info-statistics',
                       body='{}',
                       content_type='application/json')
 
@@ -370,4 +398,5 @@ class TestInfoStatistics(unittest.TestCase):
           }
         ]
 
-        self.assertEqual(json.loads(responses.calls[-1].request.body), expectedAggregateReport)
+        self.assertEqual(json.loads(responses.calls[-1].request.body),
+                         expectedAggregateReport)

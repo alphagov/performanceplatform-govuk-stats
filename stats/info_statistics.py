@@ -45,7 +45,8 @@ class Datapoint(object):
         return self.data['pagePath']
 
     def as_dict(self):
-        return {key: self.__getitem__(key) for key in (self.data_fields + self.calculated_fields)}
+        return {key: self.__getitem__(key)
+                for key in (self.data_fields + self.calculated_fields)}
 
     def __getitem__(self, item):
         if item == 'problemsPer100kViews':
@@ -58,13 +59,17 @@ class Datapoint(object):
             return self.data[item]
 
     def _contact_rate(self):
-        if self.data["uniquePageviews"] and self.data["problemReports"] and self.data["uniquePageviews"] > 0:
+        if (self.data["uniquePageviews"]
+                and self.data["problemReports"]
+                and self.data["uniquePageviews"] > 0):
             return float(self.data['problemReports'] * 100000) / self.data['uniquePageviews']
         else:
             return None
 
     def _search_rate(self):
-        if self.data["uniquePageviews"] and self.data["searchUniques"] and self.data["uniquePageviews"] > 0:
+        if (self.data["uniquePageviews"]
+                and self.data["searchUniques"]
+                and self.data["uniquePageviews"] > 0):
             return float(self.data['searchUniques'] * 100000) / self.data['uniquePageviews']
         else:
             return None
@@ -109,9 +114,12 @@ class SmartAnswer(object):
     def combine_datapoints(self, datapoints):
         combined_datapoint = Datapoint(self.path)
 
-        total_problem_reports_count = sum(datapoint.get_problem_reports_count() for datapoint in datapoints)
-        total_search_count = sum(datapoint.get_search_count() for datapoint in datapoints)
-        max_pageview_count = max(datapoint.get_pageview_count() for datapoint in datapoints)
+        total_problem_reports_count = sum(datapoint.get_problem_reports_count()
+                                          for datapoint in datapoints)
+        total_search_count = sum(datapoint.get_search_count()
+                                 for datapoint in datapoints)
+        max_pageview_count = max(datapoint.get_pageview_count()
+                                 for datapoint in datapoints)
 
         combined_datapoint.set_problem_reports_count(total_problem_reports_count)
         combined_datapoint.set_search_count(total_search_count)
@@ -141,7 +149,8 @@ class AggregatedDatasetCombiningSmartAnswers(object):
             datapoints_for_smartanswer = [dp for path, dp in datapoints.items()
                                           if smartanswer.includes(path)]
             if datapoints_for_smartanswer:
-                self._replace(datapoints, datapoints_for_smartanswer, smartanswer.combine_datapoints(datapoints_for_smartanswer))
+                self._replace(datapoints, datapoints_for_smartanswer,
+                              smartanswer.combine_datapoints(datapoints_for_smartanswer))
 
         return datapoints
 
@@ -199,7 +208,8 @@ class PerformancePlatform(object):
                                                settings.DATA_GROUP,
                                                settings.RESULTS_DATASET,
                                                token=self.pp_token)
-        enriched_results = [self._enrich_mandatory_pp_fields(result) for result in results]
+        enriched_results = [self._enrich_mandatory_pp_fields(result)
+                            for result in results]
         data_set.post(enriched_results)
 
     def _get_problem_report_counts_for_paths_starting_with(self, path_prefix):
@@ -219,7 +229,9 @@ class PerformancePlatform(object):
 
     def _get_pp_data(self, dataset_name, value,
                      filter_by=None, filter_by_prefix=None):
-        dataset = DataSet.from_group_and_type(settings.DATA_DOMAIN, settings.DATA_GROUP, dataset_name)
+        dataset = DataSet.from_group_and_type(settings.DATA_DOMAIN,
+                                              settings.DATA_GROUP,
+                                              dataset_name)
         query_parameters = {
             'group_by': 'pagePath',
             'period': 'day',
