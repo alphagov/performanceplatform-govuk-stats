@@ -316,6 +316,7 @@ class InfoStatistics(object):
         problem_report_counts = self.pp_adapter.get_problem_report_counts()
         search_counts = self.pp_adapter.get_search_counts()
         involved_paths = list(set(problem_report_counts.keys() + search_counts.keys()))
+        involved_paths.sort()
 
         logger.info('Found {} paths to get pageview counts for'.format(len(involved_paths)))
         for path in involved_paths:
