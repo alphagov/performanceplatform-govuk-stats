@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import io
 import itertools
 import json
+import logging
 import os
 import string
 import sys
@@ -13,6 +14,9 @@ from performanceplatform.client import DataSet
 import requests
 
 import settings
+
+
+logger = logging.getLogger(__name__)
 
 
 class Datapoint(object):
@@ -139,6 +143,7 @@ class AggregatedDatasetCombiningSmartAnswers(object):
         self.underlying_dataset.add_unique_pageviews(pageviews)
 
     def get_aggregated_datapoints(self):
+        logger.info('Aggregating datapoints')
         datapoints = self.underlying_dataset.get_aggregated_datapoints()
 
         for smartanswer in self.smartanswers:
@@ -177,18 +182,21 @@ class PerformancePlatform(object):
         self.end_date = end_date.strftime(self.date_format)
 
     def get_problem_report_counts(self):
+        logger.info('Getting problem report counts')
         results_by_letter = [self._get_problem_report_counts_for_paths_starting_with('/' + letter)
                              for letter in string.lowercase]
         all_results = list(itertools.chain(*results_by_letter))
         return {result["pagePath"]: result["total:sum"] for result in all_results}
 
     def get_search_counts(self):
+        logger.info('Getting search counts')
         results_by_letter = [self._get_search_counts_for_paths_starting_with('/' + letter)
                              for letter in string.lowercase]
         all_results = list(itertools.chain(*results_by_letter))
         return {result["pagePath"]: result["searchUniques:sum"] for result in all_results}
 
     def get_unique_pageviews(self, paths):
+        logger.info('Getting pageview counts')
         return {path: self.get_unique_pageviews_for_path(path) for path in paths}
 
     def get_unique_pageviews_for_path(self, path):
@@ -204,6 +212,7 @@ class PerformancePlatform(object):
                                                token=self.pp_token)
         enriched_results = [self._enrich_mandatory_pp_fields(result)
                             for result in results]
+        logger.info('Posting data to Performance Platform')
         data_set.post(enriched_results)
 
     def _get_problem_report_counts_for_paths_starting_with(self, path_prefix):
@@ -250,6 +259,8 @@ class GOVUK(object):
 
     def get_smart_answers(self):
         """Get all smart answers, from the Search API."""
+        logger.info('Getting smart answers')
+
         smart_answers = []
         url = 'https://www.gov.uk/api/search.json?filter_format=smart-answer'
         url += '&start=0&count=1000&fields=link'
@@ -289,16 +300,17 @@ class InfoStatistics(object):
         self.start_date = start_date or (self.end_date - timedelta(days=settings.DAYS))
         self.pp_adapter = PerformancePlatform(pp_token, self.start_date, self.end_date)
 
-    def process_data(self, logger=sys.stdout):
+    def process_data(self):
         smart_answers = GOVUK().get_smart_answers()
         dataset = self._load_performance_data(smart_answers)
 
         aggregated_datapoints = dataset.get_aggregated_datapoints().values()
 
-        print('Posting data to PP...', file=logger)
         self.pp_adapter.save_aggregated_results(aggregated_datapoints)
 
     def _load_performance_data(self, smart_answers):
+        logger.info('Loading performance data')
+
         dataset = AggregatedDatasetCombiningSmartAnswers(smart_answers)
         problem_report_counts = self.pp_adapter.get_problem_report_counts()
         search_counts = self.pp_adapter.get_search_counts()

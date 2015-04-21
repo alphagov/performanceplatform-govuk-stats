@@ -1,5 +1,6 @@
 from datetime import date, datetime
 import json
+import logging
 import os
 import re
 import unittest
@@ -15,6 +16,10 @@ from stats.info_statistics import (
     PerformancePlatform,
     SmartAnswer
 )
+
+
+# Prevent info/debug logging cluttering up test output
+logging.disable(logging.INFO)
 
 
 class TestGOVUK(unittest.TestCase):
@@ -361,7 +366,7 @@ class TestInfoStatistics(unittest.TestCase):
                       body='{}',
                       content_type='application/json')
 
-        self.info.process_data(logger=open(os.devnull, 'w'))
+        self.info.process_data()
 
         # we're expecting:
         # - 26 GETs to PP: search terms (one for each letter of the alphabet)
