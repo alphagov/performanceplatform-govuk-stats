@@ -180,13 +180,15 @@ class PerformancePlatform(object):
         results_by_letter = [self._get_problem_report_counts_for_paths_starting_with('/' + letter)
                              for letter in string.lowercase]
         all_results = list(itertools.chain(*results_by_letter))
-        return {result["pagePath"]: result["total:sum"] for result in all_results}
+        return {result["pagePath"].encode('utf-8'): result["total:sum"]
+                for result in all_results}
 
     def get_search_counts(self):
         results_by_letter = [self._get_search_counts_for_paths_starting_with('/' + letter)
                              for letter in string.lowercase]
         all_results = list(itertools.chain(*results_by_letter))
-        return {result["pagePath"]: result["searchUniques:sum"] for result in all_results}
+        return {result["pagePath"].encode('utf-8'): result["searchUniques:sum"]
+                for result in all_results}
 
     def get_unique_pageviews(self, paths):
         return {path: self.get_unique_pageviews_for_path(path) for path in paths}
@@ -257,7 +259,7 @@ class GOVUK(object):
             r = requests.get(url)
             if r.status_code == 200:
                 results = r.json()['results']
-                return [SmartAnswer(result['link']) for result in results]
+                return [SmartAnswer(result['link'].encode('utf-8')) for result in results]
         except requests.exceptions.ConnectionError, requests.exceptions.HTTPError:
             print('ERROR ' + url, file=sys.stderr)
 

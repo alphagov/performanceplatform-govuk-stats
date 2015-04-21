@@ -1,3 +1,5 @@
+# coding=utf-8
+
 from datetime import date, datetime
 import json
 import os
@@ -25,7 +27,7 @@ class TestGOVUK(unittest.TestCase):
         {
           "results": [
             {
-              "link": "/am-i-getting-minimum-wage"
+              "link": "/am-i-getting-minimum-wag€"
             }
           ]
         }
@@ -39,7 +41,7 @@ class TestGOVUK(unittest.TestCase):
                       content_type='application/json')
 
         self.assertEqual(GOVUK().get_smart_answers(),
-                         [SmartAnswer("/am-i-getting-minimum-wage")])
+                         [SmartAnswer("/am-i-getting-minimum-wag€")])
 
 
 class TestPerformancePlatform(unittest.TestCase):
@@ -68,7 +70,7 @@ class TestPerformancePlatform(unittest.TestCase):
         {
           "data": [
             {
-              "pagePath": "/academies-financial-returns",
+              "pagePath": "/academi€s-financial-returns",
               "total:sum": 5.0
             },
             {
@@ -102,7 +104,7 @@ class TestPerformancePlatform(unittest.TestCase):
                                  end_date=date(2015, 01, 27))
 
         expected_problem_report_counts = {
-            "/academies-financial-returns": 5,
+            "/academi€s-financial-returns": 5,
             "/am-i-getting-minimum-wage": 3,
             "/am-i-getting-minimum-wage/y": 1
         }
@@ -115,7 +117,7 @@ class TestPerformancePlatform(unittest.TestCase):
         {
           "data": [
             {
-              "pagePath": "/academies-financial-returns",
+              "pagePath": "/academi€s-financial-returns",
               "searchUniques:sum": 10.0
             },
             {
@@ -149,7 +151,7 @@ class TestPerformancePlatform(unittest.TestCase):
                                  end_date=date(2015, 01, 27))
 
         expected_search_counts = {
-            "/academies-financial-returns": 10,
+            "/academi€s-financial-returns": 10,
             "/am-i-getting-minimum-wage": 2,
             "/am-i-getting-minimum-wage/y": 1
         }
@@ -169,7 +171,7 @@ class TestPerformancePlatform(unittest.TestCase):
         """
 
         expected_pageviews_calls = {
-            "/academies-financial-returns": 1000,
+            "/academi€s-financial-returns": 1000,
             "/am-i-getting-minimum-wage": 2000,
             "/am-i-getting-minimum-wage/y": 500
         }
@@ -186,7 +188,7 @@ class TestPerformancePlatform(unittest.TestCase):
                                  end_date=date(2015, 01, 27))
 
         expected_pageview_counts = {
-            "/academies-financial-returns": 1000,
+            "/academi€s-financial-returns": 1000,
             "/am-i-getting-minimum-wage": 2000,
             "/am-i-getting-minimum-wage/y": 500
         }
@@ -257,11 +259,11 @@ class TestInfoStatistics(unittest.TestCase):
               "searchUniques:sum": 10.0
             },
             {
-              "pagePath": "/am-i-getting-minimum-wage",
+              "pagePath": "/am-i-getting-minimum-wag€",
               "searchUniques:sum": 2.0
             },
             {
-              "pagePath": "/am-i-getting-minimum-wage/y",
+              "pagePath": "/am-i-getting-minimum-wag€/y",
               "searchUniques:sum": 1.0
             }
           ]
@@ -275,11 +277,11 @@ class TestInfoStatistics(unittest.TestCase):
               "total:sum": 5.0
             },
             {
-              "pagePath": "/am-i-getting-minimum-wage",
+              "pagePath": "/am-i-getting-minimum-wag€",
               "total:sum": 3.0
             },
             {
-              "pagePath": "/am-i-getting-minimum-wage/y",
+              "pagePath": "/am-i-getting-minimum-wag€/y",
               "total:sum": 1.0
             }
           ]
@@ -299,15 +301,15 @@ class TestInfoStatistics(unittest.TestCase):
 
         expected_pageviews_calls = {
             "/academies-financial-returns": 1000,
-            "/am-i-getting-minimum-wage": 2000,
-            "/am-i-getting-minimum-wage/y": 500
+            "/am-i-getting-minimum-wag€": 2000,
+            "/am-i-getting-minimum-wag€/y": 500
         }
 
         smart_answers = """
         {
           "results": [
             {
-              "link": "/am-i-getting-minimum-wage"
+              "link": "/am-i-getting-minimum-wag€"
             }
           ]
         }
@@ -373,30 +375,30 @@ class TestInfoStatistics(unittest.TestCase):
 
         expectedAggregateReport = [
           {
-            "_id": "_academies-financial-returns",
-            "_timestamp": "2015-01-27T00:00:00Z",
-            "_start_at": "2014-12-16T00:00:00Z",
-            "_end_at": "2015-01-27T00:00:00Z",
-            "searchesPer100kViews": 1000.0,
-            "problemsPer100kViews": 500.0,
-            "pagePath": "/academies-financial-returns",
-            "searchUniques": 10.0,
-            "problemReports": 5.0,
-            "uniquePageviews": 1000
+            u"_id": u"_am-i-getting-minimum-wag€",
+            u"_timestamp": u"2015-01-27T00:00:00Z",
+            u"_start_at": u"2014-12-16T00:00:00Z",
+            u"_end_at": u"2015-01-27T00:00:00Z",
+            u"searchesPer100kViews": 150.0,
+            u"problemsPer100kViews": 200.0,
+            u"pagePath": u"/am-i-getting-minimum-wag€",
+            u"searchUniques": 3.0,
+            u"problemReports": 4.0,
+            u"uniquePageviews": 2000
           },
           {
-            "_id": "_am-i-getting-minimum-wage",
-            "_timestamp": "2015-01-27T00:00:00Z",
-            "_start_at": "2014-12-16T00:00:00Z",
-            "_end_at": "2015-01-27T00:00:00Z",
-            "searchesPer100kViews": 150.0,
-            "problemsPer100kViews": 200.0,
-            "pagePath": "/am-i-getting-minimum-wage",
-            "searchUniques": 3.0,
-            "problemReports": 4.0,
-            "uniquePageviews": 2000
+            u"_id": u"_academies-financial-returns",
+            u"_timestamp": u"2015-01-27T00:00:00Z",
+            u"_start_at": u"2014-12-16T00:00:00Z",
+            u"_end_at": u"2015-01-27T00:00:00Z",
+            u"searchesPer100kViews": 1000.0,
+            u"problemsPer100kViews": 500.0,
+            u"pagePath": u"/academies-financial-returns",
+            u"searchUniques": 10.0,
+            u"problemReports": 5.0,
+            u"uniquePageviews": 1000
           }
         ]
 
-        self.assertEqual(json.loads(responses.calls[-1].request.body),
-                         expectedAggregateReport)
+        posted_body = json.loads(responses.calls[-1].request.body)
+        self.assertEqual(posted_body, expectedAggregateReport)
