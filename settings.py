@@ -20,4 +20,7 @@ logger.setLevel(logging.INFO)
 handler = logging.StreamHandler(stream=sys.stdout)
 handler.setLevel(logging.INFO)
 
+formatter = logging.Formatter(fmt='%(asctime)s %(message)s')
+handler.setFormatter(formatter)
+
 logger.addHandler(handler)
