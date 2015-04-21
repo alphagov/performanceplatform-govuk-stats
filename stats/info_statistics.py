@@ -247,6 +247,7 @@ class PerformancePlatform(object):
         elif filter_by_prefix:
             query_parameters['filter_by_prefix'] = 'pagePath:' + filter_by_prefix
 
+        logger.debug('Getting {0} data with params {1}'.format(dataset_name, query_parameters))
         json_data = dataset.get(query_parameters)
 
         if 'data' in json_data:
@@ -315,6 +316,11 @@ class InfoStatistics(object):
         problem_report_counts = self.pp_adapter.get_problem_report_counts()
         search_counts = self.pp_adapter.get_search_counts()
         involved_paths = list(set(problem_report_counts.keys() + search_counts.keys()))
+
+        logger.info('Found {} paths to get pageview counts for'.format(len(involved_paths)))
+        for path in involved_paths:
+            logger.debug(path)
+
         unique_pageviews = self.pp_adapter.get_unique_pageviews(involved_paths)
 
         dataset.add_unique_pageviews(unique_pageviews)
