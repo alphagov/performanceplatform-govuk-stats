@@ -303,7 +303,7 @@ class CSVWriter(object):
             fieldnames = Datapoint.all_fields
             writer = csv.DictWriter(report, fieldnames=fieldnames)
 
-            logger.info('Writing report to CSV file: {}'.format(self.output_filename))
+            logger.info('Writing report to CSV file: %s', self.output_filename)
 
             writer.writeheader()
             writer.writerows(dp.as_dict() for dp in datapoints)
@@ -355,7 +355,7 @@ class InfoStatistics(object):
         involved_paths = list(set(problem_report_counts.keys() + search_counts.keys()))
         involved_paths.sort()
 
-        logger.info('Found {} paths to get pageview counts for'.format(len(involved_paths)))
+        logger.info('Found %d paths to get pageview counts for', len(involved_paths))
         for path in involved_paths:
             logger.debug(path)
 
