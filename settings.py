@@ -14,6 +14,9 @@ DAYS = 42
 RESULTS_DATASET = 'info-statistics'
 
 
+REPORT_FILENAME = 'report_{}_{}.csv'
+
+
 LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
 logging_level = getattr(logging, LOG_LEVEL.upper())
 

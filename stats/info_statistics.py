@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import copy
+import csv
 from datetime import datetime, timedelta
 import io
 import itertools
@@ -22,6 +23,7 @@ logger = logging.getLogger(__name__)
 class Datapoint(object):
     data_fields = ['uniquePageviews', 'problemReports', 'searchUniques', 'pagePath']
     calculated_fields = ['_id', 'problemsPer100kViews', 'searchesPer100kViews']
+    all_fields = data_fields + calculated_fields
 
     def __init__(self, path):
         self.data = {field: 0 for field in self.data_fields}
@@ -49,7 +51,7 @@ class Datapoint(object):
         return self.data['pagePath']
 
     def as_dict(self):
-        return {key: self[key] for key in (self.data_fields + self.calculated_fields)}
+        return {key: self[key] for key in self.all_fields}
 
     def __getitem__(self, item):
         if item == 'problemsPer100kViews':
@@ -276,6 +278,37 @@ class GOVUK(object):
             print('ERROR ' + url, file=sys.stderr)
 
 
+class CSVWriter(object):
+    """
+    Write datapoints to a CSV file.
+
+    The filename can be passed in, or a date-based one will be used.
+    """
+    def __init__(self, start_date=None, end_date=None, output_filename=None):
+        if output_filename is None and None in (start_date, end_date):
+            raise ValueError('CSVWriter requires either output_filename or both start_date and end_date')
+
+        self.output_filename = output_filename or self._csv_filename(start_date, end_date)
+
+    @staticmethod
+    def _format_date(date_or_datetime):
+        return date_or_datetime.strftime('%Y-%m-%d')
+
+    def _csv_filename(self, start_date, end_date):
+        return settings.REPORT_FILENAME.format(self._format_date(start_date),
+                                               self._format_date(end_date))
+
+    def write_datapoints(self, datapoints):
+        with open(self.output_filename, 'w') as report:
+            fieldnames = Datapoint.all_fields
+            writer = csv.DictWriter(report, fieldnames=fieldnames)
+
+            logger.info('Writing report to CSV file: %s', self.output_filename)
+
+            writer.writeheader()
+            writer.writerows(dp.as_dict() for dp in datapoints)
+
+
 class InfoStatistics(object):
     """
     Generate the aggregated data for the PP's info-statistics dataset.
@@ -292,7 +325,7 @@ class InfoStatistics(object):
       on the number of unique page views
     - Normalise problem reports / searches by the number of unique
       page views
-    - Write output to a local JSON file and to the PP
+    - Write output to a local CSV file and to the PP
     """
 
     def __init__(self, pp_token, start_date=None, end_date=None):
@@ -302,6 +335,7 @@ class InfoStatistics(object):
         self.end_date = end_date or datetime.utcnow()
         self.start_date = start_date or (self.end_date - timedelta(days=settings.DAYS))
         self.pp_adapter = PerformancePlatform(pp_token, self.start_date, self.end_date)
+        self.csv_writer = CSVWriter(start_date=self.start_date, end_date=self.end_date)
 
     def process_data(self):
         smart_answers = GOVUK().get_smart_answers()
@@ -309,6 +343,7 @@ class InfoStatistics(object):
 
         aggregated_datapoints = dataset.get_aggregated_datapoints().values()
 
+        self.csv_writer.write_datapoints(aggregated_datapoints)
         self.pp_adapter.save_aggregated_results(aggregated_datapoints)
 
     def _load_performance_data(self, smart_answers):
@@ -320,7 +355,7 @@ class InfoStatistics(object):
         involved_paths = list(set(problem_report_counts.keys() + search_counts.keys()))
         involved_paths.sort()
 
-        logger.info('Found {} paths to get pageview counts for'.format(len(involved_paths)))
+        logger.info('Found %d paths to get pageview counts for', len(involved_paths))
         for path in involved_paths:
             logger.debug(path)
 
