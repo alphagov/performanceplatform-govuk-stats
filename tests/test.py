@@ -1,23 +1,20 @@
 # coding=utf-8
 
-from contextlib import contextmanager
 from datetime import date, datetime
 import json
 import logging
 import os
 import re
-from tempfile import mkdtemp
-import shutil
 import unittest
 import urllib
 
 from mock import patch, mock_open
 import responses
 
+from .helpers import build_datapoint_with_counts, TemporaryDirectory
 from stats.info_statistics import (
     AggregatedDataset,
     CSVWriter,
-    Datapoint,
     GOVUK,
     InfoStatistics,
     PerformancePlatform,
@@ -206,13 +203,30 @@ class TestPerformancePlatform(unittest.TestCase):
                          expected_pageview_counts)
 
 
-@contextmanager
-def TemporaryDirectory():
-    name = mkdtemp()
-    try:
-        yield name
-    finally:
-        shutil.rmtree(name)
+class TestDatapoint(unittest.TestCase):
+    def setUp(self):
+        self.datapoint = build_datapoint_with_counts('/i/am/a path')
+
+    def test_getters_and_setters(self):
+        self.assertEqual(2, self.datapoint.get_problem_reports_count())
+        self.assertEqual(5, self.datapoint.get_search_count())
+        self.assertEqual(10, self.datapoint.get_pageview_count())
+        self.assertEqual('/i/am/a path', self.datapoint.get_path())
+
+    def test_id_replaces_slashes_and_spaces(self):
+        self.assertEqual('_i_am_a%20path', self.datapoint['_id'])
+
+    def test_as_dict(self):
+        expected_dict = {
+            '_id': '_i_am_a%20path',
+            'pagePath': '/i/am/a path',
+            'problemReports': 2,
+            'problemsPer100kViews': 20000.0,
+            'searchUniques': 5,
+            'searchesPer100kViews': 50000.0,
+            'uniquePageviews': 10,
+        }
+        self.assertEqual(expected_dict, self.datapoint.as_dict())
 
 
 class TestCSVWriter(unittest.TestCase):
@@ -226,8 +240,8 @@ class TestCSVWriter(unittest.TestCase):
 
     def test_writing_csv(self):
         datapoints = [
-            self.build_datapoint_with_counts('/path1'),
-            self.build_datapoint_with_counts('/path2'),
+            build_datapoint_with_counts('/path1'),
+            build_datapoint_with_counts('/path2'),
         ]
 
         expected_csv_lines = [
@@ -244,13 +258,6 @@ class TestCSVWriter(unittest.TestCase):
             with open(csv_filename, 'r') as open_file:
                 file_lines = open_file.read().splitlines()
                 self.assertEqual(file_lines, expected_csv_lines)
-
-    def build_datapoint_with_counts(self, path):
-        datapoint = Datapoint(path)
-        datapoint.set_problem_reports_count(2)
-        datapoint.set_search_count(5)
-        datapoint.set_pageview_count(10)
-        return datapoint
 
 
 class TestAggregatedDataset(unittest.TestCase):

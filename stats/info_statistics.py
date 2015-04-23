@@ -59,7 +59,7 @@ class Datapoint(object):
         elif item == 'searchesPer100kViews':
             return self._search_rate()
         elif item == '_id':
-            return self.get_path().replace('/', '_')
+            return self.get_path().replace('/', '_').replace(' ', '%20')
         else:
             return self.data[item]
 
