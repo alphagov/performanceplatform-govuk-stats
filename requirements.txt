@@ -8,5 +8,5 @@ pyOpenSSL==0.13
 pyasn1==0.1.7
 pytz==2013d
 # We also use requests directly to request smartanswers from GOV.UK's search API
-requests==2.6.0
+requests==2.6.2
 wsgiref==0.1.2
