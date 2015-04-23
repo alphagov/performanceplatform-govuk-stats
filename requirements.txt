@@ -1,1 +1,12 @@
+# Dependencies we use directly are commented below
+
+backoff==1.0.3
+ndg-httpsclient==0.3.2
+# We use performanceplatform-client to talk to the Performance Platform
 performanceplatform-client==0.8.2
+pyOpenSSL==0.13
+pyasn1==0.1.7
+pytz==2013d
+# We also use requests directly to request smartanswers from GOV.UK's search API
+requests==2.6.0
+wsgiref==0.1.2
