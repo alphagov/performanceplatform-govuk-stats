@@ -267,7 +267,9 @@ class GOVUK(object):
         logger.info('Getting smart answers')
 
         smart_answers = []
-        url = 'https://www.gov.uk/api/search.json?filter_format=smart-answer'
+        url = 'https://www.gov.uk/api/search.json'
+        url += '?filter_format=smart-answer'
+        url += '&filter_format=simple_smart_answer'
         url += '&start=0&count=1000&fields=link'
         try:
             r = requests.get(url)
