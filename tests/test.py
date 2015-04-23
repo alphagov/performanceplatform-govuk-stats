@@ -205,21 +205,21 @@ class TestPerformancePlatform(unittest.TestCase):
 
 class TestDatapoint(unittest.TestCase):
     def setUp(self):
-        self.datapoint = build_datapoint_with_counts('/i/am/a/path')
+        self.datapoint = build_datapoint_with_counts('/i/am/a path')
 
     def test_getters_and_setters(self):
         self.assertEqual(2, self.datapoint.get_problem_reports_count())
         self.assertEqual(5, self.datapoint.get_search_count())
         self.assertEqual(10, self.datapoint.get_pageview_count())
-        self.assertEqual('/i/am/a/path', self.datapoint.get_path())
+        self.assertEqual('/i/am/a path', self.datapoint.get_path())
 
-    def test_id_replaces_slashes(self):
-        self.assertEqual('_i_am_a_path', self.datapoint['_id'])
+    def test_id_replaces_slashes_and_spaces(self):
+        self.assertEqual('_i_am_a%20path', self.datapoint['_id'])
 
     def test_as_dict(self):
         expected_dict = {
-            '_id': '_i_am_a_path',
-            'pagePath': '/i/am/a/path',
+            '_id': '_i_am_a%20path',
+            'pagePath': '/i/am/a path',
             'problemReports': 2,
             'problemsPer100kViews': 20000.0,
             'searchUniques': 5,
