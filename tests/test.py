@@ -44,7 +44,7 @@ class TestGOVUK(unittest.TestCase):
         """
 
         url_re = re.compile(
-            r'https://www.gov.uk/api/search.json\?filter_format=smart-answer.*?'
+            r'https://www.gov.uk/api/search.json\?filter_format=smart-answer&filter_format=simple_smart_answer.*?'
         )
         responses.add(responses.GET, url_re,
                       body=smart_answers, status=200,
@@ -410,7 +410,7 @@ class TestInfoStatistics(unittest.TestCase):
                           content_type='application/json')
 
         url_re = re.compile(
-            r'https://www.gov.uk/api/search.json\?filter_format=smart-answer.*?'
+            r'https://www.gov.uk/api/search.json\?filter_format=smart-answer&filter_format=simple_smart_answer.*?'
         )
         responses.add(responses.GET, url_re,
                       body=smart_answers, status=200,
