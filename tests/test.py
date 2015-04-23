@@ -1,23 +1,20 @@
 # coding=utf-8
 
-from contextlib import contextmanager
 from datetime import date, datetime
 import json
 import logging
 import os
 import re
-from tempfile import mkdtemp
-import shutil
 import unittest
 import urllib
 
 from mock import patch, mock_open
 import responses
 
+from .helpers import build_datapoint_with_counts, TemporaryDirectory
 from stats.info_statistics import (
     AggregatedDataset,
     CSVWriter,
-    Datapoint,
     GOVUK,
     InfoStatistics,
     PerformancePlatform,
@@ -206,13 +203,6 @@ class TestPerformancePlatform(unittest.TestCase):
                          expected_pageview_counts)
 
 
-@contextmanager
-def TemporaryDirectory():
-    name = mkdtemp()
-    try:
-        yield name
-    finally:
-        shutil.rmtree(name)
 
 
 class TestCSVWriter(unittest.TestCase):
@@ -226,8 +216,8 @@ class TestCSVWriter(unittest.TestCase):
 
     def test_writing_csv(self):
         datapoints = [
-            self.build_datapoint_with_counts('/path1'),
-            self.build_datapoint_with_counts('/path2'),
+            build_datapoint_with_counts('/path1'),
+            build_datapoint_with_counts('/path2'),
         ]
 
         expected_csv_lines = [
@@ -244,13 +234,6 @@ class TestCSVWriter(unittest.TestCase):
             with open(csv_filename, 'r') as open_file:
                 file_lines = open_file.read().splitlines()
                 self.assertEqual(file_lines, expected_csv_lines)
-
-    def build_datapoint_with_counts(self, path):
-        datapoint = Datapoint(path)
-        datapoint.set_problem_reports_count(2)
-        datapoint.set_search_count(5)
-        datapoint.set_pageview_count(10)
-        return datapoint
 
 
 class TestAggregatedDataset(unittest.TestCase):
