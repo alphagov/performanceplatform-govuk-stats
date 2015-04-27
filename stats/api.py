@@ -1,10 +1,7 @@
-from __future__ import print_function
-
 import copy
 import itertools
 import logging
 import string
-import sys
 
 from performanceplatform.client import DataSet
 import requests
@@ -128,7 +125,8 @@ class GOVUK(object):
             if r.status_code == 200:
                 results = r.json()['results']
                 return [SmartAnswer(result['link'].encode('utf-8')) for result in results]
-        except requests.exceptions.ConnectionError, requests.exceptions.HTTPError:
-            print('ERROR ' + url, file=sys.stderr)
-
-
+            else:
+                logger.error('Received %d status code when getting smartanswers from %s',
+                             r.status_code, url)
+        except (requests.exceptions.ConnectionError, requests.exceptions.HTTPError) as e:
+            logger.error('Failed to get smartanswers from %s: %s', url, str(e))
