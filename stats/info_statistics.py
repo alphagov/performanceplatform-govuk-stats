@@ -1,9 +1,6 @@
 import csv
 from datetime import datetime, timedelta
-import io
-import json
 import logging
-import os
 
 from .api import GOVUK, PerformancePlatform
 from .data import Datapoint, AggregatedDatasetCombiningSmartAnswers
