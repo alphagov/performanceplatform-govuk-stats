@@ -12,13 +12,15 @@ from mock import patch, mock_open
 import responses
 
 from .helpers import build_datapoint_with_counts, TemporaryDirectory
-from stats.info_statistics import (
+from stats.data import (
     AggregatedDataset,
+    SmartAnswer
+)
+from stats.info_statistics import (
     CSVWriter,
     GOVUK,
     InfoStatistics,
     PerformancePlatform,
-    SmartAnswer
 )
 
 
