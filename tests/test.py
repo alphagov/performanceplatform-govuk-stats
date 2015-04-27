@@ -12,16 +12,9 @@ from mock import patch, mock_open
 import responses
 
 from .helpers import build_datapoint_with_counts, TemporaryDirectory
-from stats.data import (
-    AggregatedDataset,
-    SmartAnswer
-)
-from stats.info_statistics import (
-    CSVWriter,
-    GOVUK,
-    InfoStatistics,
-    PerformancePlatform,
-)
+from stats.api import GOVUK, PerformancePlatform
+from stats.data import AggregatedDataset, SmartAnswer
+from stats.info_statistics import CSVWriter, InfoStatistics
 
 
 # Prevent info/debug logging cluttering up test output
