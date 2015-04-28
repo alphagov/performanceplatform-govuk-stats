@@ -2,7 +2,7 @@ from contextlib import contextmanager
 import shutil
 from tempfile import mkdtemp
 
-from stats.info_statistics import Datapoint
+from stats.data import Datapoint
 
 
 def build_datapoint_with_counts(path):
