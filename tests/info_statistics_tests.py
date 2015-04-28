@@ -12,7 +12,8 @@ from mock import patch, mock_open
 import responses
 
 from .helpers import build_datapoint_with_counts, TemporaryDirectory
-from stats.info_statistics import CSVWriter, InfoStatistics
+from stats.csv_writer import CSVWriter
+from stats.info_statistics import InfoStatistics
 
 
 # Prevent info/debug logging cluttering up test output
